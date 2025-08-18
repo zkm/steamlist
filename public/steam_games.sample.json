@@ -1,0 +1,33 @@
+{
+  "response": {
+    "game_count": 2,
+    "games": [
+      {
+        "appid": 10,
+        "name": "Counter-Strike",
+        "playtime_forever": 6,
+        "img_icon_url": "6b0312cda02f5f777efa2f3318c307ff9acafbb5",
+        "has_community_visible_stats": false,
+        "playtime_windows_forever": 1,
+        "playtime_mac_forever": 0,
+        "playtime_linux_forever": 4,
+        "playtime_deck_forever": 0,
+        "rtime_last_played": 1754441466,
+        "playtime_disconnected": 0
+      },
+      {
+        "appid": 20,
+        "name": "Team Fortress Classic",
+        "playtime_forever": 1,
+        "img_icon_url": "38ea7ebe3c1abbbbf4eabdbef174c41a972102b9",
+        "has_community_visible_stats": false,
+        "playtime_windows_forever": 1,
+        "playtime_mac_forever": 0,
+        "playtime_linux_forever": 1,
+        "playtime_deck_forever": 0,
+        "rtime_last_played": 1731869616,
+        "playtime_disconnected": 0
+      }
+    ]
+  }
+}
