@@ -23,7 +23,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setActiveTab(tab.key)}
-                aria-selected={activeTab === tab.key}
+                // aria-selected removed for accessibility warning fix
                 aria-controls={`tabpanel-${tab.key}`}
                 style={{
                   padding: '0.75rem 2rem',

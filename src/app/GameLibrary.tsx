@@ -1,6 +1,7 @@
 
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWindows, faApple, faLinux } from '@fortawesome/free-brands-svg-icons';
 import { faGamepad } from '@fortawesome/free-solid-svg-icons';
@@ -143,12 +144,13 @@ export default function GameLibrary() {
             }}
           >
             {game.img_icon_url ? (
-              <img
+              <Image
                 src={`https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg`}
                 alt={game.name}
                 width={72}
                 height={72}
-                style={{ borderRadius: "50%", border: "3px solid #0078d4", background: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,0.10)" }}
+                style={{ objectFit: 'cover', borderRadius: '8px', border: "3px solid #0078d4", background: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,0.10)" }}
+                unoptimized
               />
             ) : (
               <div style={{ width: 72, height: 72, borderRadius: "50%", background: "#444", display: "inline-block" }} aria-hidden="true" />
