@@ -1,6 +1,7 @@
 
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 
 function formatPlaytime(minutes: number) {
   if (minutes >= 60) {
@@ -82,12 +83,13 @@ export default function SuggestGame() {
             aria-live="polite"
           >
             {game.img_icon_url ? (
-              <img
+              <Image
                 src={`https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg`}
                 alt={game.name}
-                width={80}
-                height={80}
-                style={{ borderRadius: '50%', border: '3px solid #0078d4', background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}
+                width={72}
+                height={72}
+                style={{ objectFit: 'cover', borderRadius: '8px', border: "3px solid #0078d4", background: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,0.10)" }}
+                unoptimized
               />
             ) : (
               <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#444', display: 'inline-block' }} aria-hidden="true" />
