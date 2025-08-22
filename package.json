@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest"
+    "test": "jest",
+    "steam:id": "node scripts/resolve-steamid.js",
+  "steam:id:write": "node scripts/resolve-steamid.js --write-env",
+  "steam:games": "node scripts/fetch-owned-games.js",
+  "steam:games:sample": "cp public/steam_games.sample.json public/steam_games.json"
   },
   "dependencies": {
     "next": "15.4.6",

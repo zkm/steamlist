@@ -1,6 +1,6 @@
 
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWindows, faApple, faLinux } from '@fortawesome/free-brands-svg-icons';
@@ -40,6 +40,12 @@ export default function GameLibrary() {
   const [games, setGames] = useState<Game[]>([]);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [osFilter, setOsFilter] = useState(false);
+  const [detectedOs, setDetectedOs] = useState<'windows' | 'mac' | 'linux' | null>(null);
+  const [compat, setCompat] = useState<Record<number, boolean>>({});
+  const [scanCount, setScanCount] = useState(0);
+  const [scanTotal, setScanTotal] = useState(0);
+  const abortRef = useRef<{aborted: boolean}>({ aborted: false });
 
   useEffect(() => {
     fetch("/steam_games.json")
@@ -51,9 +57,56 @@ export default function GameLibrary() {
       .catch(() => setError("Failed to load games."));
   }, []);
 
-  const filteredGames = games.filter((game) =>
-    game.name.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+    if (/Windows/i.test(ua)) setDetectedOs('windows');
+    else if (/Macintosh|Mac OS X/i.test(ua)) setDetectedOs('mac');
+    else if (/Linux/i.test(ua)) setDetectedOs('linux');
+  }, []);
+
+  // Scan Steam appdetails to see if a game claims support for the detected OS
+  useEffect(() => {
+    if (!osFilter || !detectedOs || games.length === 0) return;
+    abortRef.current.aborted = false;
+    const maxScan = Math.min(300, games.length);
+    const slice = games.slice(0, maxScan);
+    setScanTotal(slice.length);
+    setScanCount(0);
+    (async () => {
+      const results: Record<number, boolean> = {};
+      const batchSize = 10;
+      for (let i = 0; i < slice.length && !abortRef.current.aborted; i += batchSize) {
+        const batch = slice.slice(i, i + batchSize);
+        const settled = await Promise.allSettled(
+          batch.map(g => fetch(`https://store.steampowered.com/api/appdetails?appids=${g.appid}`)
+            .then(r => r.json())
+            .then(json => {
+              const key = String(g.appid);
+              const entry = json?.[key];
+              const platforms = entry?.success ? entry?.data?.platforms : null;
+              return { appid: g.appid, ok: Boolean(platforms?.[detectedOs]) };
+            })
+          )
+        );
+        for (const s of settled) {
+          if (s.status === 'fulfilled') results[s.value.appid] = s.value.ok;
+        }
+        setCompat(prev => ({ ...prev, ...results }));
+        setScanCount(prev => prev + batch.length);
+      }
+    })();
+    return () => { abortRef.current.aborted = true; };
+  }, [osFilter, detectedOs, games]);
+
+  const filteredGames = useMemo(() => {
+    const term = search.toLowerCase();
+    let list = games.filter((g) => g.name.toLowerCase().includes(term));
+    if (osFilter && detectedOs) {
+      // While scanning, keep items with unknown status; only drop those known to be incompatible
+      list = list.filter(g => compat[g.appid] !== false);
+    }
+    return list;
+  }, [games, search, osFilter, detectedOs, compat]);
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!games.length) return (
@@ -68,7 +121,7 @@ export default function GameLibrary() {
 
   return (
     <section aria-labelledby="library-heading" style={{ width: "100%" }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 32 }}>
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 32 }}>
         <label htmlFor="search-games" style={{ fontWeight: "bold", fontSize: '1.1rem', marginBottom: 8, color: '#e0e0e0' }}>
           Search games:
         </label>
@@ -96,6 +149,26 @@ export default function GameLibrary() {
           onFocus={e => e.currentTarget.style.boxShadow = "0 0 0 3px #0078d4"}
           onBlur={e => e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.18)"}
         />
+        <div style={{ marginTop: 12, display: 'flex', gap: 16, alignItems: 'center' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#c7d2fe', fontSize: 14 }}>
+            <input
+              type="checkbox"
+              checked={osFilter}
+              onChange={(e) => setOsFilter(e.target.checked)}
+            />
+            <span>Only show games that work on {detectedOs ?? 'my OS'}</span>
+          </label>
+          {osFilter && scanTotal > 0 && scanCount < scanTotal && (
+            <span style={{ color: '#94a3b8', fontSize: 12 }}>
+              Scanning compatibility {scanCount}/{scanTotal} — results will refine as we go
+            </span>
+          )}
+          {osFilter && scanTotal > 0 && scanCount >= scanTotal && (
+            <span style={{ color: '#94a3b8', fontSize: 12 }}>
+              Compatibility scan complete for first {scanTotal} games
+            </span>
+          )}
+        </div>
       </div>
       <ul
         aria-labelledby="library-heading"

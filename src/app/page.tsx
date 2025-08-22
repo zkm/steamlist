@@ -26,19 +26,17 @@ export default function Home() {
                 // aria-selected removed for accessibility warning fix
                 aria-controls={`tabpanel-${tab.key}`}
                 style={{
-                  padding: '0.75rem 2rem',
-                  borderRadius: 24,
-                  border: 'none',
-                  background: activeTab === tab.key
-                    ? 'linear-gradient(90deg, #0078d4 60%, #00b4d8 100%)'
-                    : '#23232a',
-                  color: activeTab === tab.key ? '#fff' : '#aaa',
-                  fontWeight: 'bold',
-                  fontSize: '1.1rem',
+                  padding: '0.6rem 1.25rem',
+                  borderRadius: 20,
+                  border: activeTab === tab.key ? '1px solid #3a86ff55' : '1px solid #2f2f37',
+                  background: activeTab === tab.key ? '#232633' : 'transparent',
+                  color: activeTab === tab.key ? '#e6f0ff' : '#b5b5bf',
+                  fontWeight: 600,
+                  fontSize: '1rem',
                   cursor: 'pointer',
-                  boxShadow: activeTab === tab.key ? '0 2px 8px rgba(0,0,0,0.10)' : 'none',
+                  boxShadow: 'none',
                   outline: 'none',
-                  transition: 'background 0.2s, color 0.2s',
+                  transition: 'background 0.15s, color 0.15s, border-color 0.15s',
                 }}
                 tabIndex={0}
               >
