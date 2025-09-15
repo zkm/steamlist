@@ -65,10 +65,17 @@ describe("suggest-game API", () => {
     // @ts-ignore
     global.fetch = fetchMock;
 
+    // Mock Math.random to always return 0 (select first game in pool)
+    const originalRandom = Math.random;
+    Math.random = () => 0;
+
     const { req, res, get } = createReqRes();
     await handler(req, res);
     const state = get();
     expect(state.statusCode).toBe(200);
     expect(state.body.suggestion.name).toBe("B");
+
+    // Restore Math.random
+    Math.random = originalRandom;
   });
 });
