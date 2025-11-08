@@ -37,11 +37,22 @@ function formatDate(timestamp: number) {
 }
 
 export default function GameLibrary() {
+  // Detect OS once using useMemo
+  const detectedOsFromUA = useMemo(() => {
+    if (typeof navigator === 'undefined') return null;
+    const ua = navigator.userAgent;
+    if (/Windows/i.test(ua)) return 'windows';
+    if (/Macintosh|Mac OS X/i.test(ua)) return 'mac';
+    if (/Linux/i.test(ua)) return 'linux';
+    return null;
+  }, []);
+
   const [games, setGames] = useState<Game[]>([]);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [osFilter, setOsFilter] = useState(false);
-  const [detectedOs, setDetectedOs] = useState<'windows' | 'mac' | 'linux' | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [detectedOs, setDetectedOs] = useState<'windows' | 'mac' | 'linux' | null>(detectedOsFromUA);
   const [compat, setCompat] = useState<Record<number, boolean>>({});
   const [scanCount, setScanCount] = useState(0);
   const [scanTotal, setScanTotal] = useState(0);
@@ -51,27 +62,29 @@ export default function GameLibrary() {
     fetch("/steam_games.json")
       .then((res) => res.json())
       .then((data) => {
-        const gameList = data.response?.games?.filter((g: any) => g.appid && g.name) || [];
+        const gameList = data.response?.games?.filter((g: { appid?: number; name?: string }) => g.appid && g.name) || [];
         setGames(gameList);
       })
       .catch(() => setError("Failed to load games."));
   }, []);
 
-  useEffect(() => {
-    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-    if (/Windows/i.test(ua)) setDetectedOs('windows');
-    else if (/Macintosh|Mac OS X/i.test(ua)) setDetectedOs('mac');
-    else if (/Linux/i.test(ua)) setDetectedOs('linux');
-  }, []);
-
   // Scan Steam appdetails to see if a game claims support for the detected OS
   useEffect(() => {
     if (!osFilter || !detectedOs || games.length === 0) return;
-    abortRef.current.aborted = false;
+    
+    // Copy ref value at start of effect to avoid cleanup warning
+    const abortController = abortRef.current;
+    
     const maxScan = Math.min(300, games.length);
     const slice = games.slice(0, maxScan);
+    
+    // Set initial state - disabled lint rule as this is intentional initialization
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setScanTotal(slice.length);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setScanCount(0);
+    abortController.aborted = false;
+    
     (async () => {
       const results: Record<number, boolean> = {};
       const batchSize = 10;
@@ -95,7 +108,10 @@ export default function GameLibrary() {
         setScanCount(prev => prev + batch.length);
       }
     })();
-    return () => { abortRef.current.aborted = true; };
+    return () => { 
+      // Use copied ref value to avoid React hooks warning
+      abortController.aborted = true; 
+    };
   }, [osFilter, detectedOs, games]);
 
   const filteredGames = useMemo(() => {

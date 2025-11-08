@@ -1,6 +1,6 @@
 
 "use client";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 
 function formatPlaytime(minutes: number) {
@@ -12,45 +12,67 @@ function formatPlaytime(minutes: number) {
   return `${minutes} min`;
 }
 
+interface Game {
+  appid: number;
+  name: string;
+  playtime_forever: number;
+  img_icon_url?: string;
+}
+
 export default function SuggestGame() {
-  const [game, setGame] = useState<any>(null);
+  // Detect OS once using useMemo
+  const detectedOsFromUA = useMemo(() => {
+    if (typeof navigator === 'undefined') return null;
+    const ua = navigator.userAgent;
+    if (/Windows/i.test(ua)) return 'windows';
+    if (/Macintosh|Mac OS X/i.test(ua)) return 'mac';
+    if (/Linux/i.test(ua)) return 'linux';
+    return null;
+  }, []);
+
+  const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [osFilter, setOsFilter] = useState(false);
-  const [detectedOs, setDetectedOs] = useState<'windows' | 'mac' | 'linux' | null>(null);
+  const [detectedOs, setDetectedOs] = useState<'windows' | 'mac' | 'linux' | null>(detectedOsFromUA);
   const [advFilter, setAdvFilter] = useState(false);
-  const [cores, setCores] = useState<number | ''>('');
-  const [cpuGHz, setCpuGHz] = useState<number | ''>('');
-  const [gpuVendor, setGpuVendor] = useState<'' | 'nvidia' | 'amd' | 'intel'>('');
-  const [vramGB, setVramGB] = useState<number | ''>('');
-  const [storageGB, setStorageGB] = useState<number | ''>('');
+  // Detect hardware capabilities using useMemo
+  const detectedCores = useMemo(() => {
+    if (typeof navigator === 'undefined') return '';
+    const hc = (navigator as { hardwareConcurrency?: number })?.hardwareConcurrency;
+    return (typeof hc === 'number' && hc > 0) ? hc : '';
+  }, []);
 
-  useEffect(() => {
-    // Light client-side OS detection
-    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-    if (/Windows/i.test(ua)) setDetectedOs('windows');
-    else if (/Macintosh|Mac OS X/i.test(ua)) setDetectedOs('mac');
-    else if (/Linux/i.test(ua)) setDetectedOs('linux');
-    else setDetectedOs(null);
-
-    // Try to detect logical CPU cores
-    const hc = (navigator as any)?.hardwareConcurrency;
-    if (typeof hc === 'number' && hc > 0) setCores(hc);
-
-    // Try to detect GPU vendor via WebGL renderer info
+  // Detect GPU vendor using useMemo
+  const detectedGpuVendor = useMemo(() => {
+    if (typeof navigator === 'undefined' || typeof document === 'undefined') return '';
     try {
       const canvas = document.createElement('canvas');
       const gl = (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
       if (gl) {
-        const ext = (gl as any).getExtension('WEBGL_debug_renderer_info');
-        const vendorStr = ext ? (gl as any).getParameter(ext.UNMASKED_RENDERER_WEBGL) as string : '';
-        const s = (vendorStr || '').toLowerCase();
-        if (/nvidia|geforce/.test(s)) setGpuVendor('nvidia');
-        else if (/amd|radeon|ati/.test(s)) setGpuVendor('amd');
-        else if (/intel/.test(s)) setGpuVendor('intel');
+        const ext = (gl as WebGLRenderingContext & { getExtension(name: string): unknown }).getExtension('WEBGL_debug_renderer_info');
+        if (ext && typeof ext === 'object' && ext !== null) {
+          const rendererKey = (ext as { UNMASKED_RENDERER_WEBGL?: number }).UNMASKED_RENDERER_WEBGL;
+          if (rendererKey) {
+            const vendorStr = (gl as WebGLRenderingContext & { getParameter(param: number): unknown }).getParameter(rendererKey) as string;
+            const s = (vendorStr || '').toLowerCase();
+            if (/nvidia|geforce/.test(s)) return 'nvidia';
+            if (/amd|radeon|ati/.test(s)) return 'amd';
+            if (/intel/.test(s)) return 'intel';
+          }
+        }
       }
-    } catch {}
+    } catch (error) {
+      console.debug('WebGL GPU detection failed:', error);
+    }
+    return '';
   }, []);
+
+  const [cores, setCores] = useState<number | ''>(detectedCores);
+  const [cpuGHz, setCpuGHz] = useState<number | ''>('');
+  const [gpuVendor, setGpuVendor] = useState<'' | 'nvidia' | 'amd' | 'intel'>(detectedGpuVendor);
+  const [vramGB, setVramGB] = useState<number | ''>('');
+  const [storageGB, setStorageGB] = useState<number | ''>('');
 
   const fetchSuggestion = async () => {
     setLoading(true);
@@ -59,7 +81,7 @@ export default function SuggestGame() {
       const params = new URLSearchParams();
       if (osFilter && detectedOs) params.set('os', detectedOs);
       // Device Memory API returns approximate RAM in GB (e.g., 8, 16)
-      const dm = (navigator as any)?.deviceMemory;
+      const dm = (navigator as Navigator & { deviceMemory?: number })?.deviceMemory;
       if (osFilter && dm && typeof dm === 'number') params.set('ramGB', String(dm));
       if (advFilter) {
         if (cores !== '' && !Number.isNaN(cores)) params.set('cores', String(cores));
@@ -76,7 +98,8 @@ export default function SuggestGame() {
       } else {
         setError(data.error || "No suggestion found.");
       }
-    } catch (e) {
+    } catch (error) {
+      console.error('Failed to fetch suggestion:', error);
       setError("Failed to fetch suggestion.");
     }
     setLoading(false);
@@ -167,7 +190,7 @@ export default function SuggestGame() {
               <label>GPU Vendor</label>
               <select
                 value={gpuVendor}
-                onChange={(e) => setGpuVendor(e.target.value as any)}
+                onChange={(e) => setGpuVendor(e.target.value as 'nvidia' | 'amd' | 'intel' | '')}
                 style={{ width: '100%', borderRadius: 8, padding: '6px 8px', background: '#111827', border: '1px solid #334155', color: '#e5e7eb' }}
               >
                 <option value="">(any)</option>

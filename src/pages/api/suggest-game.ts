@@ -1,5 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+interface Game {
+  appid: number;
+  name: string;
+  playtime_forever: number;
+}
+
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
 const STEAM_ID64 = process.env.STEAM_ID64;
 
@@ -24,12 +30,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       `https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=${STEAM_API_KEY}&steamid=${STEAM_ID64}&include_appinfo=true&include_played_free_games=true`
     );
     const data = await response.json();
-    const games = data.response?.games || [];
+    const games: Game[] = data.response?.games || [];
     if (games.length === 0) {
       return res.status(404).json({ error: 'No games found.' });
     }
     // Sort by least playtime
-    games.sort((a: any, b: any) => a.playtime_forever - b.playtime_forever);
+    games.sort((a: Game, b: Game) => a.playtime_forever - b.playtime_forever);
 
     // If OS filtering or requirement checks requested, query appdetails for extra data
     let pool = games;
@@ -37,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Check a reasonable chunk from the least-played list to limit requests
       const chunk = games.slice(0, Math.min(50, games.length));
       const details = await Promise.allSettled(
-        chunk.map((g: any) =>
+        chunk.map((g: Game) =>
           fetch(`https://store.steampowered.com/api/appdetails?appids=${g.appid}`)
             .then(r => r.json())
             .then((json) => {
@@ -55,23 +61,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const getNum = (s?: string | null) => s ? parseFloat(s.replace(',', '.')) : NaN;
                 // RAM
                 let minRamGB: number | null = null;
-                const gbRam = text.match(/(\d+[\.,]?\d*)\s*gb\s*ram/);
-                const mbRam = text.match(/(\d+[\.,]?\d*)\s*mb\s*ram/);
+                const gbRam = text.match(/(\d+[.,]?\d*)\s*gb\s*ram/);
+                const mbRam = text.match(/(\d+[.,]?\d*)\s*mb\s*ram/);
                 if (gbRam) minRamGB = getNum(gbRam[1]);
                 else if (mbRam) minRamGB = getNum(mbRam[1]) / 1024;
                 // VRAM
                 let vramGBReq: number | null = null;
-                const gbVram = text.match(/(\d+[\.,]?\d*)\s*gb\s*(?:v(?:ideo)?\s*ram|vram)/);
+                const gbVram = text.match(/(\d+[.,]?\d*)\s*gb\s*(?:v(?:ideo)?\s*ram|vram)/);
                 if (gbVram) {
                   vramGBReq = getNum(gbVram[1]);
                 } else {
-                  const mbVram = text.match(/(\d+[\.,]?\d*)\s*mb\s*(?:v(?:ideo)?\s*ram|vram)/);
+                  const mbVram = text.match(/(\d+[.,]?\d*)\s*mb\s*(?:v(?:ideo)?\s*ram|vram)/);
                   if (mbVram) vramGBReq = getNum(mbVram[1]) / 1024;
                 }
                 // Storage
                 let storageGBReq: number | null = null;
-                const gbStorage = text.match(/(\d+[\.,]?\d*)\s*gb\s*(?:available\s*)?(?:space|storage)/);
-                const mbStorage = text.match(/(\d+[\.,]?\d*)\s*mb\s*(?:available\s*)?(?:space|storage)/);
+                const gbStorage = text.match(/(\d+[.,]?\d*)\s*gb\s*(?:available\s*)?(?:space|storage)/);
+                const mbStorage = text.match(/(\d+[.,]?\d*)\s*mb\s*(?:available\s*)?(?:space|storage)/);
                 if (gbStorage) storageGBReq = getNum(gbStorage[1]);
                 else if (mbStorage) storageGBReq = getNum(mbStorage[1]) / 1024;
                 // Cores
@@ -84,7 +90,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 if (numericCores) minCores = Math.max(minCores ?? 0, parseInt(numericCores[1], 10));
                 // CPU GHz
                 let minGHz: number | null = null;
-                const ghz = text.match(/(\d+[\.,]?\d*)\s*ghz/);
+                const ghz = text.match(/(\d+[.,]?\d*)\s*ghz/);
                 if (ghz) minGHz = getNum(ghz[1]);
                 // GPU vendor mentions
                 const vendors = new Set<'nvidia' | 'amd' | 'intel'>();
@@ -137,7 +143,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       for (const d of details) {
         if (d.status === 'fulfilled' && d.value.ok) okSet.add(d.value.appid);
       }
-      const compatible = chunk.filter((g: any) => okSet.has(g.appid));
+      const compatible = chunk.filter((g: Game) => okSet.has(g.appid));
       // Fallback: if nothing compatible in the chunk, keep original list to still return something
       pool = compatible.length ? compatible : chunk;
     } else {
@@ -149,6 +155,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const suggestion = pool[Math.floor(Math.random() * pool.length)];
     res.status(200).json({ suggestion, filteredByOs: Boolean(validOs), requirementsChecked: Boolean(wantsReqCheck) });
   } catch (error) {
+    console.error('Failed to fetch games:', error);
     res.status(500).json({ error: 'Failed to fetch games.' });
   }
 }
