@@ -32,8 +32,8 @@ function loadEnvFile(envFilePath) {
       }
       if (!(key in process.env)) process.env[key] = val;
     }
-  } catch (e) {
-    // ignore missing file
+  } catch {  
+    // Ignore missing file
   }
 }
 
@@ -74,7 +74,9 @@ function parseUrl(input) {
     if (parts[0] === 'id' && parts[1]) {
       return { type: 'vanity', value: parts[1] };
     }
-  } catch {}
+  } catch {
+    // Ignore parse errors
+  }
   return null;
 }
 
@@ -139,7 +141,9 @@ Input can be:
   if (writeEnv) {
     const envPath = path.resolve(process.cwd(), envFile);
     let content = '';
-    try { content = fs.readFileSync(envPath, 'utf8'); } catch {}
+    try { content = fs.readFileSync(envPath, 'utf8'); } catch {
+      // Ignore if file doesn't exist
+    }
     const lines = content ? content.split(/\r?\n/) : [];
     let found = false;
     const updated = lines.map(line => {

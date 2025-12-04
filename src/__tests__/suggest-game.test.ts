@@ -1,24 +1,24 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from "@jest/globals";
 
-type Handler = (req: any, res: any) => Promise<void>;
+type Handler = (req: Record<string, unknown>, res: Record<string, unknown>) => Promise<void>;
 
-function jsonResponse(data: any, ok = true, status = 200) {
+function jsonResponse(data: unknown, ok = true, status = 200) {
   return {
     ok,
     status,
     json: async () => data,
-  } as any;
+  } as Record<string, unknown>;
 }
 
-function createReqRes(query: Record<string, any> = {}) {
-  const req: any = { query };
-  const state: any = { statusCode: 0, body: undefined };
-  const res: any = {
+function createReqRes(query: Record<string, unknown> = {}) {
+  const req: Record<string, unknown> = { query };
+  const state: Record<string, unknown> = { statusCode: 0, body: undefined };
+  const res: Record<string, unknown> = {
     status(code: number) {
       state.statusCode = code;
       return this;
     },
-    json(payload: any) {
+    json(payload: unknown) {
       state.body = payload;
       return this;
     },
@@ -40,8 +40,8 @@ beforeEach(() => {
 
 afterEach(() => {
   // cleanup fetch mock
-  // @ts-ignore
-  delete (global as any).fetch;
+  // @ts-expect-error - global.fetch is a global that may not exist
+  delete (global as Record<string, unknown>).fetch;
   jest.restoreAllMocks();
 });
 
@@ -55,14 +55,14 @@ describe("suggest-game API", () => {
       { appid: 3, name: "C", playtime_forever: 10 },
     ];
 
-    const fetchMock: jest.Mock = jest.fn().mockImplementation((url: unknown) => {
+    const fetchMock = jest.fn().mockImplementation((url: unknown) => {
       const href = String(url);
       if (href.includes("GetOwnedGames")) {
         return jsonResponse({ response: { games } });
       }
       return jsonResponse({});
     });
-    // @ts-ignore
+    // @ts-expect-error - setting global.fetch
     global.fetch = fetchMock;
 
     // Mock Math.random to always return 0 (select first game in pool)

@@ -78,10 +78,8 @@ export default function GameLibrary() {
     const maxScan = Math.min(300, games.length);
     const slice = games.slice(0, maxScan);
     
-    // Set initial state - disabled lint rule as this is intentional initialization
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // Set initial state
     setScanTotal(slice.length);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setScanCount(0);
     abortController.aborted = false;
     

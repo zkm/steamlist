@@ -25,7 +25,7 @@ function loadEnvFile(envFilePath) {
       }
       if (!(key in process.env)) process.env[key] = val;
     }
-  } catch (e) {
+  } catch {  
     // ignore missing file
   }
 }
