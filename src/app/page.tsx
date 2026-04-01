@@ -1,24 +1,35 @@
-
-
-"use client";
+'use client';
 
 import { useState } from 'react';
 import GameLibrary from './GameLibrary';
 import SuggestGame from './SuggestGame';
+import BadgeLibrary from './BadgeLibrary';
 
 const tabs = [
   { label: 'Suggest a Game', key: 'suggest' },
   { label: 'Game Library', key: 'library' },
+  { label: 'Badges', key: 'badges' },
 ];
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('suggest');
   return (
-    <main style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', minHeight: '100vh', background: '#18181b', color: '#fff', paddingTop: 40 }}>
+    <main
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        minHeight: '100vh',
+        background: '#18181b',
+        color: '#fff',
+        paddingTop: 40,
+      }}
+    >
       <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Steam Game App</h1>
       <nav aria-label="Main tabs" style={{ marginBottom: 32 }}>
         <ul style={{ display: 'flex', gap: 16, listStyle: 'none', padding: 0, margin: 0 }}>
-          {tabs.map(tab => (
+          {tabs.map((tab) => (
             <li key={tab.key}>
               <button
                 type="button"
@@ -46,14 +57,28 @@ export default function Home() {
           ))}
         </ul>
       </nav>
-  <section aria-labelledby={`tab-${activeTab}`} style={{ width: '100%', maxWidth: activeTab === 'library' ? 1400 : 400 }}>
+      <section
+        aria-labelledby={`tab-${activeTab}`}
+        style={{ width: '100%', maxWidth: activeTab === 'suggest' ? 400 : 1400 }}
+      >
         <div
           id="tabpanel-suggest"
           role="tabpanel"
           aria-hidden={activeTab !== 'suggest'}
-          style={{ display: activeTab === 'suggest' ? 'block' : 'none', maxWidth: 400, margin: '0 auto' }}
+          style={{
+            display: activeTab === 'suggest' ? 'block' : 'none',
+            maxWidth: 400,
+            margin: '0 auto',
+          }}
         >
-          <div style={{ background: '#23232a', borderRadius: 12, padding: '2rem', boxShadow: '0 2px 16px rgba(0,0,0,0.2)' }}>
+          <div
+            style={{
+              background: '#23232a',
+              borderRadius: 12,
+              padding: '2rem',
+              boxShadow: '0 2px 16px rgba(0,0,0,0.2)',
+            }}
+          >
             <SuggestGame />
           </div>
         </div>
@@ -64,6 +89,14 @@ export default function Home() {
           style={{ display: activeTab === 'library' ? 'block' : 'none', width: '100%' }}
         >
           <GameLibrary />
+        </div>
+        <div
+          id="tabpanel-badges"
+          role="tabpanel"
+          aria-hidden={activeTab !== 'badges'}
+          style={{ display: activeTab === 'badges' ? 'block' : 'none', width: '100%' }}
+        >
+          <BadgeLibrary />
         </div>
       </section>
     </main>

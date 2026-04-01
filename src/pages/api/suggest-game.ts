@@ -15,17 +15,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-  const os = (req.query.os as string | undefined)?.toLowerCase();
+    const os = (req.query.os as string | undefined)?.toLowerCase();
     const validOs = os === 'windows' || os === 'mac' || os === 'linux' ? os : undefined;
-  const ramGB = req.query.ramGB ? Number(req.query.ramGB) : undefined;
-  const cores = req.query.cores ? Number(req.query.cores) : undefined;
-  const cpuGHz = req.query.cpuGHz ? Number(req.query.cpuGHz) : undefined;
-  const gpuVendorQ = (req.query.gpuVendor as string | undefined)?.toLowerCase();
-  const gpuVendor = gpuVendorQ === 'nvidia' || gpuVendorQ === 'amd' || gpuVendorQ === 'intel' ? gpuVendorQ : undefined;
-  const vramGB = req.query.vramGB ? Number(req.query.vramGB) : undefined;
-  const storageGB = req.query.storageGB ? Number(req.query.storageGB) : undefined;
-  const wantsAdvancedCheck = [cores, cpuGHz, gpuVendor, vramGB, storageGB].some(v => v !== undefined) || (typeof ramGB === 'number' && !Number.isNaN(ramGB));
-  const wantsReqCheck = typeof ramGB === 'number' && !Number.isNaN(ramGB) && ramGB > 0;
+    const ramGB = req.query.ramGB ? Number(req.query.ramGB) : undefined;
+    const cores = req.query.cores ? Number(req.query.cores) : undefined;
+    const cpuGHz = req.query.cpuGHz ? Number(req.query.cpuGHz) : undefined;
+    const gpuVendorQ = (req.query.gpuVendor as string | undefined)?.toLowerCase();
+    const gpuVendor =
+      gpuVendorQ === 'nvidia' || gpuVendorQ === 'amd' || gpuVendorQ === 'intel'
+        ? gpuVendorQ
+        : undefined;
+    const vramGB = req.query.vramGB ? Number(req.query.vramGB) : undefined;
+    const storageGB = req.query.storageGB ? Number(req.query.storageGB) : undefined;
+    const wantsAdvancedCheck =
+      [cores, cpuGHz, gpuVendor, vramGB, storageGB].some((v) => v !== undefined) ||
+      (typeof ramGB === 'number' && !Number.isNaN(ramGB));
+    const wantsReqCheck = typeof ramGB === 'number' && !Number.isNaN(ramGB) && ramGB > 0;
     const response = await fetch(
       `https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=${STEAM_API_KEY}&steamid=${STEAM_ID64}&include_appinfo=true&include_played_free_games=true`
     );
@@ -45,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const details = await Promise.allSettled(
         chunk.map((g: Game) =>
           fetch(`https://store.steampowered.com/api/appdetails?appids=${g.appid}`)
-            .then(r => r.json())
+            .then((r) => r.json())
             .then((json) => {
               const key = String(g.appid);
               const entry = json?.[key];
@@ -58,7 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                   .replace(/<br\s*\/?>(?=.)/gi, '\n')
                   .replace(/<[^>]+>/g, '')
                   .toLowerCase();
-                const getNum = (s?: string | null) => s ? parseFloat(s.replace(',', '.')) : NaN;
+                const getNum = (s?: string | null) => (s ? parseFloat(s.replace(',', '.')) : NaN);
                 // RAM
                 let minRamGB: number | null = null;
                 const gbRam = text.match(/(\d+[.,]?\d*)\s*gb\s*ram/);
@@ -76,16 +81,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 }
                 // Storage
                 let storageGBReq: number | null = null;
-                const gbStorage = text.match(/(\d+[.,]?\d*)\s*gb\s*(?:available\s*)?(?:space|storage)/);
-                const mbStorage = text.match(/(\d+[.,]?\d*)\s*mb\s*(?:available\s*)?(?:space|storage)/);
+                const gbStorage = text.match(
+                  /(\d+[.,]?\d*)\s*gb\s*(?:available\s*)?(?:space|storage)/
+                );
+                const mbStorage = text.match(
+                  /(\d+[.,]?\d*)\s*mb\s*(?:available\s*)?(?:space|storage)/
+                );
                 if (gbStorage) storageGBReq = getNum(gbStorage[1]);
                 else if (mbStorage) storageGBReq = getNum(mbStorage[1]) / 1024;
                 // Cores
                 let minCores: number | null = null;
                 if (/\bdual\s*-?\s*core\b/.test(text)) minCores = Math.max(minCores ?? 0, 2);
                 if (/\bquad\s*-?\s*core\b/.test(text)) minCores = Math.max(minCores ?? 0, 4);
-                if (/(hexa|six)[-\s]*core|\b6\s*core\b/.test(text)) minCores = Math.max(minCores ?? 0, 6);
-                if (/(octa|eight)[-\s]*core|\b8\s*core\b/.test(text)) minCores = Math.max(minCores ?? 0, 8);
+                if (/(hexa|six)[-\s]*core|\b6\s*core\b/.test(text))
+                  minCores = Math.max(minCores ?? 0, 6);
+                if (/(octa|eight)[-\s]*core|\b8\s*core\b/.test(text))
+                  minCores = Math.max(minCores ?? 0, 8);
                 const numericCores = text.match(/(\d+)\s*(?:core|cores)/);
                 if (numericCores) minCores = Math.max(minCores ?? 0, parseInt(numericCores[1], 10));
                 // CPU GHz
@@ -103,7 +114,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               let reqOk = true;
               if (wantsReqCheck && validOs) {
                 // Parse minimum RAM from OS-specific requirements HTML
-                const reqFieldMap: Record<'windows' | 'mac' | 'linux', 'pc_requirements' | 'mac_requirements' | 'linux_requirements'> = {
+                const reqFieldMap: Record<
+                  'windows' | 'mac' | 'linux',
+                  'pc_requirements' | 'mac_requirements' | 'linux_requirements'
+                > = {
                   windows: 'pc_requirements',
                   mac: 'mac_requirements',
                   linux: 'linux_requirements',
@@ -153,7 +167,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Pick a random game among the pool
     const suggestion = pool[Math.floor(Math.random() * pool.length)];
-    res.status(200).json({ suggestion, filteredByOs: Boolean(validOs), requirementsChecked: Boolean(wantsReqCheck) });
+    res.status(200).json({
+      suggestion,
+      filteredByOs: Boolean(validOs),
+      requirementsChecked: Boolean(wantsReqCheck),
+    });
   } catch (error) {
     console.error('Failed to fetch games:', error);
     res.status(500).json({ error: 'Failed to fetch games.' });

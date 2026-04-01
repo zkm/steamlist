@@ -43,3 +43,6 @@ yarn-error.log*
 # steam game data
 public/steam_games.json
 next-env.d.ts
+
+# local editor settings
+.vscode/settings.json

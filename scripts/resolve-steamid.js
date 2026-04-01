@@ -27,12 +27,15 @@ function loadEnvFile(envFilePath) {
       if (eq === -1) continue;
       const key = trimmed.slice(0, eq).trim();
       let val = trimmed.slice(eq + 1).trim();
-      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+      if (
+        (val.startsWith('"') && val.endsWith('"')) ||
+        (val.startsWith("'") && val.endsWith("'"))
+      ) {
         val = val.slice(1, -1);
       }
       if (!(key in process.env)) process.env[key] = val;
     }
-  } catch {  
+  } catch {
     // Ignore missing file
   }
 }
@@ -106,9 +109,9 @@ Input can be:
     process.exit(0);
   }
 
-  const input = args.find(a => !a.startsWith('--'));
+  const input = args.find((a) => !a.startsWith('--'));
   const writeEnv = args.includes('--write-env');
-  const envFileArg = args.find(a => a.startsWith('--env-file='));
+  const envFileArg = args.find((a) => a.startsWith('--env-file='));
   const envFile = envFileArg ? envFileArg.split('=')[1] : '.env.local';
 
   loadEnvFile(path.resolve(process.cwd(), envFile));
@@ -141,12 +144,14 @@ Input can be:
   if (writeEnv) {
     const envPath = path.resolve(process.cwd(), envFile);
     let content = '';
-    try { content = fs.readFileSync(envPath, 'utf8'); } catch {
+    try {
+      content = fs.readFileSync(envPath, 'utf8');
+    } catch {
       // Ignore if file doesn't exist
     }
     const lines = content ? content.split(/\r?\n/) : [];
     let found = false;
-    const updated = lines.map(line => {
+    const updated = lines.map((line) => {
       if (line.startsWith('STEAM_ID64=')) {
         found = true;
         return `STEAM_ID64=${steamid64}`;
@@ -159,7 +164,7 @@ Input can be:
   }
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error('[resolve-steamid] Error:', err.message || err);
   process.exit(1);
 });
