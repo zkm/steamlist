@@ -166,8 +166,10 @@ const APP_BADGE_IMAGE_URLS: Record<number, string> = {
 // App badge variants: maps appid to variants based on badge level
 const APP_BADGE_VARIANTS: Record<number, { standard: string; foiled: string }> = {
   730: {
-    standard: 'https://cdn.fastly.steamstatic.com/steamcommunity/public/images/items/730/400f2cdf69db174f5616038edbb7a3f8e917ae00.png',
-    foiled: 'https://cdn.fastly.steamstatic.com/steamcommunity/public/images/items/730/8203d824739e19c69aa4e33d761ce53a16159d19.png',
+    standard:
+      'https://cdn.fastly.steamstatic.com/steamcommunity/public/images/items/730/400f2cdf69db174f5616038edbb7a3f8e917ae00.png',
+    foiled:
+      'https://cdn.fastly.steamstatic.com/steamcommunity/public/images/items/730/8203d824739e19c69aa4e33d761ce53a16159d19.png',
   },
 };
 

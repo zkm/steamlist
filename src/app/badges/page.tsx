@@ -15,6 +15,7 @@ export default function BadgesPage() {
         background: '#18181b',
         color: '#fff',
         paddingTop: 40,
+        paddingBottom: 56,
       }}
     >
       <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Steam Game App</h1>

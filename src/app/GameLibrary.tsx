@@ -19,6 +19,8 @@ interface Game {
   playtime_disconnected?: number;
 }
 
+type ViewMode = 'grid' | 'list';
+
 function formatPlaytime(minutes: number) {
   if (minutes >= 60) {
     const hours = Math.floor(minutes / 60);
@@ -56,6 +58,7 @@ export default function GameLibrary() {
   const [compat, setCompat] = useState<Record<number, boolean>>({});
   const [scanCount, setScanCount] = useState(0);
   const [scanTotal, setScanTotal] = useState(0);
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
   const abortRef = useRef<{ aborted: boolean }>({ aborted: false });
 
   useEffect(() => {
@@ -207,175 +210,285 @@ export default function GameLibrary() {
             </span>
           )}
         </div>
+
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: 8,
+            marginTop: 14,
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setViewMode('grid')}
+            style={{
+              padding: '0.35rem 0.9rem',
+              borderRadius: 16,
+              border: viewMode === 'grid' ? '1px solid #5491cf' : '1px solid #3a3d40',
+              background:
+                viewMode === 'grid'
+                  ? 'linear-gradient(to bottom, #232424 5%, #141414 95%)'
+                  : 'linear-gradient(to bottom, #1f2022 5%, #141414 95%)',
+              color: viewMode === 'grid' ? '#c7d5e0' : '#8f98a0',
+              fontWeight: 500,
+              fontSize: '0.82rem',
+              cursor: 'pointer',
+            }}
+          >
+            Grid
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('list')}
+            style={{
+              padding: '0.35rem 0.9rem',
+              borderRadius: 16,
+              border: viewMode === 'list' ? '1px solid #5491cf' : '1px solid #3a3d40',
+              background:
+                viewMode === 'list'
+                  ? 'linear-gradient(to bottom, #232424 5%, #141414 95%)'
+                  : 'linear-gradient(to bottom, #1f2022 5%, #141414 95%)',
+              color: viewMode === 'list' ? '#c7d5e0' : '#8f98a0',
+              fontWeight: 500,
+              fontSize: '0.82rem',
+              cursor: 'pointer',
+            }}
+          >
+            List
+          </button>
+        </div>
       </div>
       <ul
         aria-labelledby="library-heading"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-          gap: '2rem',
+          gridTemplateColumns:
+            viewMode === 'grid' ? 'repeat(auto-fill, minmax(280px, 1fr))' : 'minmax(0, 1fr)',
+          gap: viewMode === 'grid' ? 16 : 8,
           listStyle: 'none',
           padding: 0,
           margin: 'auto',
-          maxWidth: '1750px',
+          maxWidth: 1080,
           textAlign: 'left',
         }}
       >
         {filteredGames.map((game) => (
           <li
             key={game.appid}
-            tabIndex={0}
             aria-label={`Game: ${game.name}, Playtime: ${formatPlaytime(game.playtime_forever)}`}
             style={{
-              background: 'linear-gradient(135deg, #23232a 60%, #35354a 100%)',
-              borderRadius: 18,
-              padding: 32,
-              textAlign: 'left',
-              boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
-              outline: 'none',
-              transition: 'box-shadow 0.2s, border 0.2s, transform 0.2s',
-              position: 'relative',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              height: 400,
+              display: 'block',
               minWidth: 0,
-              width: '100%',
-              maxWidth: 220,
-              transform: 'scale(1)',
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 0 4px #0078d4';
-              e.currentTarget.style.transform = 'scale(1.03)';
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.18)';
-              e.currentTarget.style.transform = 'scale(1)';
             }}
           >
-            {game.img_icon_url ? (
-              <Image
-                src={`https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg`}
-                alt={game.name}
-                width={72}
-                height={72}
-                style={{
-                  objectFit: 'cover',
-                  borderRadius: '8px',
-                  border: '3px solid #0078d4',
-                  background: '#fff',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
-                }}
-                unoptimized
-              />
-            ) : (
+            <div
+              style={{
+                display: 'block',
+                position: 'relative',
+                padding: 1,
+                background: 'linear-gradient(to bottom, #383939 5%, #000000 95%)',
+                borderRadius: 5,
+                marginBottom: viewMode === 'list' ? 8 : 0,
+                borderTop: '1px solid #2e2c2c',
+                borderRight: '1px solid #242425',
+                borderBottom: '1px solid transparent',
+                borderLeft: '1px solid transparent',
+              }}
+            >
               <div
                 style={{
-                  width: 72,
-                  height: 72,
-                  borderRadius: '50%',
-                  background: '#444',
-                  display: 'inline-block',
+                  background: 'linear-gradient(to bottom, #232424 5%, #141414 95%)',
+                  borderRadius: 5,
+                  padding: viewMode === 'grid' ? '1rem' : '0.75rem 0.85rem',
                 }}
-                aria-hidden="true"
-              />
-            )}
-            <div
-              style={{
-                marginTop: 16,
-                marginBottom: 12,
-                lineHeight: 1.25,
-                fontWeight: 'bold',
-                fontSize: '1rem',
-                color: '#e0e0e0',
-              }}
-            >
-              {game.name}
-            </div>
-            <div style={{ fontSize: 14, color: '#aaa', marginBottom: 8 }}>
-              Playtime: {formatPlaytime(game.playtime_forever)}
-            </div>
-            <div style={{ fontSize: 13, color: '#bbb', marginBottom: 4 }}>
-              <strong>Last played:</strong> {formatDate(game.rtime_last_played ?? 0)}
-            </div>
-            <div
-              style={{
-                fontSize: 13,
-                color: '#bbb',
-                marginBottom: 4,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-              }}
-            >
-              <strong style={{ marginRight: 8 }}>Platforms:</strong>
-              <span title="Windows" style={{ display: 'inline-flex', alignItems: 'center' }}>
-                <FontAwesomeIcon icon={faWindows} style={{ fontSize: 20, color: '#0078d4' }} />
-              </span>
-              <span title="Mac" style={{ display: 'inline-flex', alignItems: 'center' }}>
-                <FontAwesomeIcon icon={faApple} style={{ fontSize: 20, color: '#aaa' }} />
-              </span>
-              <span title="Linux" style={{ display: 'inline-flex', alignItems: 'center' }}>
-                <FontAwesomeIcon icon={faLinux} style={{ fontSize: 20, color: '#4caf50' }} />
-              </span>
-              <span title="Steam Deck" style={{ display: 'inline-flex', alignItems: 'center' }}>
-                <FontAwesomeIcon icon={faGamepad} style={{ fontSize: 20, color: '#00b4d8' }} />
-              </span>
-            </div>
-            <div style={{ fontSize: 13, color: '#bbb', marginBottom: 4 }}>
-              <strong>Community Stats:</strong>{' '}
-              {game.has_community_visible_stats ? 'Available' : 'No'}
-            </div>
-            <div style={{ fontSize: 13, color: '#bbb', marginBottom: 8 }}>
-              <strong>Offline Playtime:</strong> {formatPlaytime(game.playtime_disconnected ?? 0)}
-            </div>
-            <div style={{ flex: 1 }} />
-            <div
-              style={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'flex-end',
-                marginBottom: 0,
-              }}
-            >
-              <button
-                style={{
-                  padding: '0.5rem 1.25rem',
-                  borderRadius: 24,
-                  border: '2px solid #0078d4',
-                  background: 'transparent',
-                  color: '#0078d4',
-                  fontWeight: 'bold',
-                  fontSize: '1rem',
-                  cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
-                  transition: 'background 0.2s, box-shadow 0.2s, color 0.2s',
-                  outline: 'none',
-                  whiteSpace: 'nowrap',
-                }}
-                aria-label={`View ${game.name} on Steam`}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = '#0078d4';
-                  e.currentTarget.style.color = '#fff';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.color = '#0078d4';
-                }}
-                onFocus={(e) => (e.currentTarget.style.boxShadow = '0 0 0 3px #00b4d8')}
-                onBlur={(e) => (e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.10)')}
-                onClick={() =>
-                  window.open(
-                    `https://store.steampowered.com/app/${game.appid}`,
-                    '_blank',
-                    'noopener,noreferrer'
-                  )
-                }
               >
-                View on Steam
-              </button>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: viewMode === 'grid' ? 10 : 12,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 10,
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: viewMode === 'grid' ? 'flex-start' : 'center',
+                        gap: 12,
+                        minWidth: 0,
+                        width: '100%',
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: 'relative',
+                          width: 78,
+                          height: viewMode === 'grid' ? 64 : 78,
+                          borderRadius: 4,
+                          overflow: 'hidden',
+                          background:
+                            'radial-gradient(circle at 50% 35%, #3e4f66 0%, #2a3443 42%, #1a1f28 100%)',
+                          flexShrink: 0,
+                          border: '1px solid #3b4656',
+                          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
+                        }}
+                      >
+                        {game.img_icon_url ? (
+                          <Image
+                            src={`https://media.steampowered.com/steamcommunity/public/images/apps/${game.appid}/${game.img_icon_url}.jpg`}
+                            alt={game.name}
+                            fill
+                            sizes="78px"
+                            style={{ objectFit: 'contain', objectPosition: 'center' }}
+                            unoptimized
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              background: 'linear-gradient(135deg, #3c3f42 0%, #1f2226 100%)',
+                            }}
+                            aria-hidden="true"
+                          />
+                        )}
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'flex-start',
+                          minWidth: 0,
+                          textAlign: 'left',
+                        }}
+                      >
+                        <span
+                          style={{
+                            color: '#ffffff',
+                            fontWeight: 300,
+                            fontSize: viewMode === 'grid' ? '0.9rem' : '1rem',
+                            textAlign: 'left',
+                            lineHeight: 1.3,
+                            whiteSpace: viewMode === 'grid' ? 'normal' : 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%',
+                          }}
+                        >
+                          {game.name}
+                        </span>
+                        <span style={{ color: '#7b7b7c', fontSize: '0.78rem' }}>
+                          Last Played: {formatDate(game.rtime_last_played ?? 0)}
+                        </span>
+                        <span style={{ color: '#8f98a0', fontSize: '0.72rem' }}>
+                          Community Stats: {game.has_community_visible_stats ? 'Available' : 'No'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: viewMode === 'grid' ? 'flex-start' : 'flex-end',
+                        justifyContent: 'center',
+                        minWidth: 92,
+                        flexShrink: 0,
+                        textAlign: viewMode === 'grid' ? 'left' : 'right',
+                      }}
+                    >
+                      <span style={{ color: '#5491cf', fontSize: '0.83rem', fontWeight: 600 }}>
+                        {formatPlaytime(game.playtime_forever)}
+                      </span>
+                      <span style={{ color: '#6b6b6b', fontSize: '0.68rem' }}>
+                        Offline: {formatPlaytime(game.playtime_disconnected ?? 0)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 10,
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        color: '#8f98a0',
+                      }}
+                    >
+                      <span
+                        title="Windows"
+                        style={{ display: 'inline-flex', alignItems: 'center' }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faWindows}
+                          style={{ fontSize: 16, color: '#5491cf' }}
+                        />
+                      </span>
+                      <span title="Mac" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                        <FontAwesomeIcon
+                          icon={faApple}
+                          style={{ fontSize: 16, color: '#9aa3ab' }}
+                        />
+                      </span>
+                      <span title="Linux" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                        <FontAwesomeIcon
+                          icon={faLinux}
+                          style={{ fontSize: 16, color: '#7bbf6a' }}
+                        />
+                      </span>
+                      <span
+                        title="Steam Deck"
+                        style={{ display: 'inline-flex', alignItems: 'center' }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faGamepad}
+                          style={{ fontSize: 16, color: '#5fb3c8' }}
+                        />
+                      </span>
+                    </div>
+
+                    <button
+                      style={{
+                        padding: '0.35rem 0.9rem',
+                        borderRadius: 16,
+                        border: '1px solid #3a3d40',
+                        background: 'linear-gradient(to bottom, #1f2022 5%, #141414 95%)',
+                        color: '#c7d5e0',
+                        fontWeight: 500,
+                        fontSize: '0.78rem',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap',
+                      }}
+                      aria-label={`View ${game.name} on Steam`}
+                      onClick={() =>
+                        window.open(
+                          `https://store.steampowered.com/app/${game.appid}`,
+                          '_blank',
+                          'noopener,noreferrer'
+                        )
+                      }
+                    >
+                      View on Steam
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </li>
         ))}
