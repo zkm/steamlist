@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "module": "CommonJS",
+    "moduleResolution": "node16",
+    "isolatedModules": true,
+    "ignoreDeprecations": "6.0"
+  }
+}
