@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import SuggestGame from './SuggestGame';
+import GameLibrary from '../GameLibrary';
 
-export default function Home() {
+export default function GameLibraryPage() {
   return (
     <main
       style={{
@@ -21,25 +21,8 @@ export default function Home() {
       <nav aria-label="Main tabs" style={{ marginBottom: 32 }}>
         <ul style={{ display: 'flex', gap: 16, listStyle: 'none', padding: 0, margin: 0 }}>
           <li>
-            <span
-              aria-current="page"
-              style={{
-                display: 'inline-block',
-                padding: '0.6rem 1.25rem',
-                borderRadius: 20,
-                border: '1px solid #3a86ff55',
-                background: '#232633',
-                color: '#e6f0ff',
-                fontWeight: 600,
-                fontSize: '1rem',
-              }}
-            >
-              Suggest a Game
-            </span>
-          </li>
-          <li>
             <Link
-              href="/game-library"
+              href="/"
               style={{
                 display: 'inline-block',
                 padding: '0.6rem 1.25rem',
@@ -56,8 +39,25 @@ export default function Home() {
                 transition: 'background 0.15s, color 0.15s, border-color 0.15s',
               }}
             >
-              Game Library
+              Suggest a Game
             </Link>
+          </li>
+          <li>
+            <span
+              aria-current="page"
+              style={{
+                display: 'inline-block',
+                padding: '0.6rem 1.25rem',
+                borderRadius: 20,
+                border: '1px solid #3a86ff55',
+                background: '#232633',
+                color: '#e6f0ff',
+                fontWeight: 600,
+                fontSize: '1rem',
+              }}
+            >
+              Game Library
+            </span>
           </li>
           <li>
             <Link
@@ -83,17 +83,8 @@ export default function Home() {
           </li>
         </ul>
       </nav>
-      <section style={{ width: '100%', maxWidth: 400 }}>
-        <div
-          style={{
-            background: '#23232a',
-            borderRadius: 12,
-            padding: '2rem',
-            boxShadow: '0 2px 16px rgba(0,0,0,0.2)',
-          }}
-        >
-          <SuggestGame />
-        </div>
+      <section style={{ width: '100%', maxWidth: 1400 }}>
+        <GameLibrary />
       </section>
     </main>
   );
