@@ -31,7 +31,7 @@ async function loadHandler(): Promise<Handler> {
   process.env.STEAM_API_KEY = 'test_key';
   process.env.STEAM_ID64 = '12345678901234567';
   const mod = await import('../pages/api/suggest-game');
-  return mod.default as Handler;
+  return mod.default as unknown as Handler;
 }
 
 beforeEach(() => {
@@ -40,7 +40,6 @@ beforeEach(() => {
 
 afterEach(() => {
   // cleanup fetch mock
-  // @ts-expect-error - global.fetch is a global that may not exist
   delete (global as Record<string, unknown>).fetch;
   jest.restoreAllMocks();
 });
@@ -73,7 +72,8 @@ describe('suggest-game API', () => {
     await handler(req, res);
     const state = get();
     expect(state.statusCode).toBe(200);
-    expect(state.body.suggestion.name).toBe('B');
+    const body = state.body as { suggestion: { name: string } };
+    expect(body.suggestion.name).toBe('B');
 
     // Restore Math.random
     Math.random = originalRandom;
