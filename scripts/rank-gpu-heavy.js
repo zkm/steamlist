@@ -37,9 +37,7 @@ function parseReqText(html) {
     vramGB = getNum(labeledMb[1]) / 1024;
   } else {
     // grab every bare "<n>gb" in the graphics line and take the max as the VRAM figure
-    const bare = [...graphicsLine.matchAll(/\b(\d+[.,]?\d*)\s?gb\b/gi)].map((mm) =>
-      getNum(mm[1])
-    );
+    const bare = [...graphicsLine.matchAll(/\b(\d+[.,]?\d*)\s?gb\b/gi)].map((mm) => getNum(mm[1]));
     if (bare.length) vramGB = Math.max(...bare);
   }
 
@@ -181,7 +179,9 @@ async function main() {
     console.log(`${n + 1}. ${r.name} (appid ${r.appid}) - ${model}, ${vram}`);
   });
 
-  console.error(`\n[rank-gpu-heavy] ${results.length}/${games.length} games had parsable GPU requirement data. ${skipped.length} skipped (no data or no GPU info listed).`);
+  console.error(
+    `\n[rank-gpu-heavy] ${results.length}/${games.length} games had parsable GPU requirement data. ${skipped.length} skipped (no data or no GPU info listed).`
+  );
 }
 
 main();
