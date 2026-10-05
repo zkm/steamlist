@@ -88,6 +88,17 @@ yarn dev
 
 Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
+### Linux launch reference
+
+The **Launch Reference** tab is a searchable table of Steam launch options for Linux: which games run natively or through Proton, which are blocked by anti-cheat, their ProtonDB rating, and a copyable launch string with notes.
+
+```sh
+yarn steam:launch          # draft rows for games missing from public/launch_reference.json
+yarn steam:launch:sample   # or start from the sample data
+```
+
+Drafts are filled from the Steam store, ProtonDB and AreWeAntiCheatYet and marked "Draft" in their notes; edit `public/launch_reference.json` to finish them and to describe your machine in `setup`. The file is gitignored.
+
 ### OS compatibility filtering
 
 On the Suggest page you can enable "Only show games that work on my OS". The app will:

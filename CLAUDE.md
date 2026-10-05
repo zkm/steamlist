@@ -15,6 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `yarn steam:id <input>` — resolve a SteamID64 from a vanity URL/profile URL/legacy/ID3 format (`--write-env` to persist into `.env.local`)
 - `yarn steam:games` — fetch the configured account's owned games into `public/steam_games.json` (gitignored; requires `STEAM_API_KEY` + `STEAM_ID64`)
 - `yarn steam:games:sample` — copy `public/steam_games.sample.json` over `public/steam_games.json` for demo data without hitting the Steam API
+- `yarn steam:launch` — add draft rows to `public/launch_reference.json` (gitignored) for owned games that have none, using the Steam store, ProtonDB and AreWeAntiCheatYet (`--dry-run` to preview). `yarn steam:launch:sample` copies the committed sample instead
 
 ESLint config lives solely in `eslint.config.mjs` (flat config — required by ESLint 10, which no longer reads `.eslintrc.json`).
 
@@ -33,6 +34,8 @@ This is an intentionally **hybrid-router** Next.js app:
 
 1. **Static snapshot**: `public/steam_games.json` (gitignored, produced by `yarn steam:games` or `yarn steam:games:sample`) is fetched directly by the client with `fetch('/steam_games.json')`. `GameLibrary.tsx` and `BadgeLibrary.tsx` (for app-name lookups) read from this snapshot — they do not hit the Steam API for the owned-games list.
 2. **Live API routes**: `SuggestGame.tsx` calls `/api/suggest-game`, which does its own live `GetOwnedGames` fetch server-side on every request (does not read the JSON snapshot). `BadgeLibrary.tsx` calls `/api/badges`, which live-fetches `GetBadges` + `GetOwnedGames` server-side.
+
+The **launch reference** (`/launch-reference`, `LaunchReference.tsx`) is a third, hand-curated snapshot: `public/launch_reference.json` (`{ setup, games }`, gitignored because it lists the owner's library and hardware) is fetched client-side, falling back to the committed `public/launch_reference.sample.json`. Filter/sort logic lives in `src/lib/launchReference.ts`.
 
 Both the client (`GameLibrary.tsx`) and the API routes (`suggest-game.ts`) independently call the public, CORS-open `store.steampowered.com/api/appdetails` endpoint per-appid — client-side for OS-compatibility badges in the library view, server-side for OS/spec filtering in the suggestion endpoint. There's a shared informal contract for parsing Steam's free-form HTML requirements text (RAM/VRAM/storage/cores/GHz/GPU vendor) duplicated between `suggest-game.ts` and `scripts/rank-gpu-heavy.js` — if you fix a parsing bug in one, check the other.
 

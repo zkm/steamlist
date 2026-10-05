@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import BadgeLibrary from '../BadgeLibrary';
+import LaunchReference from '../LaunchReference';
 
-export default function BadgesPage() {
+export default function LaunchReferencePage() {
   return (
     <main
       style={{
@@ -23,7 +23,7 @@ export default function BadgesPage() {
         <ul style={{ display: 'flex', gap: 16, listStyle: 'none', padding: 0, margin: 0 }}>
           <li>
             <Link
-              href="/game-library"
+              href="/"
               style={{
                 display: 'inline-block',
                 padding: '0.6rem 1.25rem',
@@ -45,7 +45,7 @@ export default function BadgesPage() {
           </li>
           <li>
             <Link
-              href="/"
+              href="/game-library"
               style={{
                 display: 'inline-block',
                 padding: '0.6rem 1.25rem',
@@ -66,25 +66,8 @@ export default function BadgesPage() {
             </Link>
           </li>
           <li>
-            <span
-              aria-current="page"
-              style={{
-                display: 'inline-block',
-                padding: '0.6rem 1.25rem',
-                borderRadius: 20,
-                border: '1px solid #3a86ff55',
-                background: '#232633',
-                color: '#e6f0ff',
-                fontWeight: 600,
-                fontSize: '1rem',
-              }}
-            >
-              Badges
-            </span>
-          </li>
-          <li>
             <Link
-              href="/launch-reference"
+              href="/badges"
               style={{
                 display: 'inline-block',
                 padding: '0.6rem 1.25rem',
@@ -101,13 +84,30 @@ export default function BadgesPage() {
                 transition: 'background 0.15s, color 0.15s, border-color 0.15s',
               }}
             >
-              Launch Reference
+              Badges
             </Link>
+          </li>
+          <li>
+            <span
+              aria-current="page"
+              style={{
+                display: 'inline-block',
+                padding: '0.6rem 1.25rem',
+                borderRadius: 20,
+                border: '1px solid #3a86ff55',
+                background: '#232633',
+                color: '#e6f0ff',
+                fontWeight: 600,
+                fontSize: '1rem',
+              }}
+            >
+              Launch Reference
+            </span>
           </li>
         </ul>
       </nav>
-      <section style={{ width: '100%', maxWidth: 1400 }}>
-        <BadgeLibrary />
+      <section style={{ width: '100%', maxWidth: 1600 }}>
+        <LaunchReference />
       </section>
     </main>
   );
