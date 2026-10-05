@@ -1,0 +1,83 @@
+{
+  "setup": "Sample data. Describe your distro, desktop, GPU and display here. Launch strings assume gamemode and MangoHud are installed.",
+  "games": [
+    {
+      "appid": 1172470,
+      "name": "Apex Legends",
+      "win": "Y",
+      "mac": "N",
+      "linux": "N",
+      "works": "N",
+      "runtime": "N/A",
+      "protondb": "silver",
+      "full": "—",
+      "opt": "",
+      "notes": "Blocked by anti-cheat: EAC (Linux disabled by EA, Oct 2024). EA disabled Linux/Proton access in late 2024. Requires Windows."
+    },
+    {
+      "appid": 49520,
+      "name": "Borderlands 2",
+      "win": "Y",
+      "mac": "Y",
+      "linux": "Y",
+      "works": "Y",
+      "runtime": "Proton Experimental",
+      "protondb": "platinum",
+      "full": "gamemoderun mangohud %command% -nostartupmovies -NoLauncher",
+      "opt": "-nostartupmovies -NoLauncher",
+      "notes": "Proton: native port is outdated (pre-2019), runs worse, lacks newer DLC and can't play with Windows players. Force Proton in Compatibility settings before installing. Flags skip the SHiFT launcher and intro movies."
+    },
+    {
+      "appid": 730,
+      "name": "Counter-Strike 2",
+      "win": "Y",
+      "mac": "N",
+      "linux": "Y",
+      "works": "Y",
+      "runtime": "Native",
+      "protondb": "gold",
+      "full": "gamemoderun mangohud %command% -novid",
+      "opt": "-novid",
+      "notes": "Native only (Source 2 Vulkan). Use Fullscreen at your native resolution in-game."
+    },
+    {
+      "appid": 1091500,
+      "name": "Cyberpunk 2077",
+      "win": "Y",
+      "mac": "Y",
+      "linux": "N",
+      "works": "Y",
+      "runtime": "Proton Experimental",
+      "protondb": "gold",
+      "full": "gamemoderun mangohud %command% --launcher-skip -skipStartScreen",
+      "opt": "--launcher-skip -skipStartScreen",
+      "notes": "No Denuvo. Use in-game FSR for upscaling, not gamescope."
+    },
+    {
+      "appid": 620,
+      "name": "Portal 2",
+      "win": "Y",
+      "mac": "N",
+      "linux": "Y",
+      "works": "Y",
+      "runtime": "Proton Experimental",
+      "protondb": "platinum",
+      "full": "gamemoderun mangohud %command% -novid",
+      "opt": "-novid",
+      "notes": "Proton: native port has resolution-detection problems on modern setups; the Windows build via DXVK is smoother."
+    },
+    {
+      "appid": 413150,
+      "name": "Stardew Valley",
+      "win": "Y",
+      "mac": "Y",
+      "linux": "Y",
+      "works": "Y",
+      "runtime": "Native",
+      "protondb": "platinum",
+      "full": "gamemoderun mangohud %command%",
+      "opt": "",
+      "notes": "Native build is excellent; SMAPI mods have a Linux installer."
+    }
+  ]
+}

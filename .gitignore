@@ -42,6 +42,10 @@ yarn-error.log*
 
 # steam game data
 public/steam_games.json
+public/launch_reference.json
+
+# local reference material that isn't part of the app
+docs/reference/
 next-env.d.ts
 
 # local editor settings

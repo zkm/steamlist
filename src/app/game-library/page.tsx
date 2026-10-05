@@ -82,6 +82,28 @@ export default function GameLibraryPage() {
               Badges
             </Link>
           </li>
+          <li>
+            <Link
+              href="/launch-reference"
+              style={{
+                display: 'inline-block',
+                padding: '0.6rem 1.25rem',
+                borderRadius: 20,
+                border: '1px solid #2f2f37',
+                background: 'transparent',
+                color: '#b5b5bf',
+                fontWeight: 600,
+                fontSize: '1rem',
+                cursor: 'pointer',
+                boxShadow: 'none',
+                outline: 'none',
+                textDecoration: 'none',
+                transition: 'background 0.15s, color 0.15s, border-color 0.15s',
+              }}
+            >
+              Launch Reference
+            </Link>
+          </li>
         </ul>
       </nav>
       <section style={{ width: '100%', maxWidth: 1400 }}>
