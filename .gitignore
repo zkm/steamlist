@@ -43,6 +43,7 @@ yarn-error.log*
 # steam game data
 public/steam_games.json
 public/launch_reference.json
+exports/
 
 # local reference material that isn't part of the app
 docs/reference/
