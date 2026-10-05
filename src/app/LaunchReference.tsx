@@ -53,7 +53,7 @@ const code: CSSProperties = {
   padding: '0.35rem 0.5rem',
   borderRadius: 5,
   whiteSpace: 'pre-wrap',
-  wordBreak: 'break-word',
+  overflowWrap: 'break-word',
 };
 
 function pill(active: boolean): CSSProperties {
