@@ -99,6 +99,10 @@ yarn steam:launch:sample   # or start from the sample data
 
 Drafts are filled from the Steam store, ProtonDB and AreWeAntiCheatYet and marked "Draft" in their notes; edit `public/launch_reference.json` to finish them and to describe your machine in `setup`. The file is gitignored.
 
+Launch strings are built from the **Default Launch Parameters** (gamescope, GameMode, MangoHud, optional flags), so turning one off updates every game. **Edit** gives a game its own settings, flags, notes and a Verified/Unverified status. These changes are saved in your browser; use **Backup & Restore** to move them. To change the starting defaults (also used by the export), add a `defaults` object to the JSON, for example `"defaults": { "gamescope": true }`.
+
+`yarn steam:launch:export` writes the same page as one standalone HTML file to `exports/`.
+
 ### OS compatibility filtering
 
 On the Suggest page you can enable "Only show games that work on my OS". The app will:
