@@ -53,6 +53,7 @@
     "typescript-eslint": "^8.62.0"
   },
   "resolutions": {
-    "tar": "^7.5.21"
+    "tar": "^7.5.21",
+    "micromark-extension-math/katex": "^0.18.9"
   }
 }
