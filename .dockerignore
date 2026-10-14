@@ -1,0 +1,18 @@
+# Keep secrets, local data and build output out of the image.
+.env*
+!.env.example
+public/steam_games.json
+public/launch_reference.json
+exports/
+docs/reference/
+
+.git
+.github
+.next
+node_modules
+coverage
+.vscode
+.yarn/install-state.gz
+*.tsbuildinfo
+Dockerfile
+compose.yaml

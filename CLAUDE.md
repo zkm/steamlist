@@ -28,7 +28,7 @@ Required in `.env.local` (gitignored): `STEAM_API_KEY`, `STEAM_ID64`. These are 
 This is an intentionally **hybrid-router** Next.js app:
 
 - **UI lives in the App Router** (`src/app/`). Every page (`page.tsx`, `game-library/page.tsx`, `badges/page.tsx`) and the components they render (`SuggestGame.tsx`, `GameLibrary.tsx`, `BadgeLibrary.tsx`) are `'use client'` components — there is no server-component data fetching in this app.
-- **API endpoints live in the Pages Router** (`src/pages/api/*.ts`), using the `NextApiRequest`/`NextApiResponse` handler signature, *not* the App Router `route.ts` convention. When adding a new endpoint, add it under `src/pages/api/`, matching the existing style.
+- **API endpoints live in the Pages Router** (`src/pages/api/*.ts`), using the `NextApiRequest`/`NextApiResponse` handler signature, _not_ the App Router `route.ts` convention. When adding a new endpoint, add it under `src/pages/api/`, matching the existing style.
 
 ### Two independent data paths — don't conflate them
 
