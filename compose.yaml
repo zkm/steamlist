@@ -1,0 +1,15 @@
+services:
+  steamlist:
+    build: .
+    image: steamlist:latest
+    container_name: steamlist
+    restart: unless-stopped
+    ports:
+      - '3123:3123'
+    # STEAM_API_KEY / STEAM_ID64 are read at runtime by the API routes, never baked into the image.
+    env_file: .env.local
+    volumes:
+      # Refresh with `yarn steam:games` / `yarn steam:launch` on the host; no rebuild needed.
+      # Both files must exist first, or Docker creates empty directories in their place.
+      - ./public/steam_games.json:/app/public/steam_games.json:ro
+      - ./public/launch_reference.json:/app/public/launch_reference.json:ro
