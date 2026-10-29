@@ -1,5 +1,16 @@
 # Steamlist
 
+[![Next.js CI](https://github.com/zkm/steamlist/actions/workflows/nextjs.yml/badge.svg)](https://github.com/zkm/steamlist/actions/workflows/nextjs.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
+![React 19](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Jest](https://img.shields.io/badge/Jest-C21325?logo=jest&logoColor=white)
+![Steam Web API](https://img.shields.io/badge/Steam%20Web%20API-000000?logo=steam&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+![Yarn 4](https://img.shields.io/badge/Yarn-4-2C8EBB?logo=yarn&logoColor=white)
+
 A modern, accessible Next.js app to view and suggest Steam games from your library.
 
 ## Features
